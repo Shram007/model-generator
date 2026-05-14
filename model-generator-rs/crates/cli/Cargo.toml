@@ -1,0 +1,20 @@
+[package]
+name = "model-generator-rs"
+description = "Rust CLI for PRA model generation (fault trees + event trees)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "model-gen"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap = { workspace = true }
+serde_json.workspace = true
+toml.workspace = true
+config = { path = "../config" }
+pdag = { path = "../pdag" }
