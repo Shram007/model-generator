@@ -1,0 +1,17 @@
+[package]
+name = "pdag"
+description = "Probabilistic DAG builder for the PRA model generator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+serde = { workspace = true }
+petgraph.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true
+config = { path = "../config" }
