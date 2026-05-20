@@ -3,6 +3,10 @@ members = [
     "crates/config",
     "crates/pdag",
     "crates/cli",
+    "crates/fault_tree",
+    "crates/event_tree",
+    "crates/connector",
+    "crates/validator",
 ]
 resolver = "2"
 
@@ -32,3 +36,6 @@ rand_chacha = "0.3"
 
 # CLI
 clap = { version = "4.5", features = ["derive"] }
+
+# XML
+quick-xml = "0.38"
