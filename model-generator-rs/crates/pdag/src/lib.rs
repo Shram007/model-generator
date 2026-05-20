@@ -22,7 +22,7 @@
 //! The construction is entirely deterministic given the same [`PdagConfig`]
 //! seed, which ensures reproducibility.
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use petgraph::graph::{DiGraph, NodeIndex};
 use petgraph::Direction;
@@ -258,7 +258,7 @@ impl PdagBuilder {
             }
             let mut connected = graph
                 .neighbors_directed(parent, Direction::Outgoing)
-                .collect::<BTreeSet<_>>();
+                .collect::<HashSet<_>>();
             while connected.len() < target {
                 let candidates = children
                     .iter()

@@ -60,7 +60,6 @@ impl ProbabilisticValidator {
             ));
         }
 
-        let mut sum = 0.0;
         for be in ft.basic_events.values() {
             if !(0.0..=1.0).contains(&be.probability) {
                 return Err(ValidationError::Probabilistic(format!(
@@ -68,15 +67,6 @@ impl ProbabilisticValidator {
                     be.name, be.probability
                 )));
             }
-            sum += be.probability;
-        }
-
-        let estimate = sum / (ft.basic_events.len() as f64);
-        if !(0.0..=1.0).contains(&estimate) {
-            return Err(ValidationError::Probabilistic(format!(
-                "top-event estimate {} outside [0,1]",
-                estimate
-            )));
         }
 
         Ok(())

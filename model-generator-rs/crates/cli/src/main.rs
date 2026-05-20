@@ -2,8 +2,6 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
-#[cfg(test)]
-use std::time::Instant;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand, ValueEnum};
@@ -398,6 +396,7 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
+    use std::time::Instant;
 
     use super::*;
 
