@@ -1,0 +1,11 @@
+[package]
+name = "event_tree"
+description = "Event Tree model and mapper"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+thiserror.workspace = true

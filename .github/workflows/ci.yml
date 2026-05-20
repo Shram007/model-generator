@@ -1,0 +1,31 @@
+name: Rust CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-build-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: model-generator-rs
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+      - name: Run tests
+        run: cargo test
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+      - name: Schema/structure validation check
+        run: |
+          cargo run -p model-generator-rs -- config --out /tmp/ci-config.toml
+          cargo run -p model-generator-rs -- generate --config /tmp/ci-config.toml --format xml --out /tmp/ci-model.xml --event-tree
+          python - <<'PY'
+import xml.etree.ElementTree as ET
+ET.parse('/tmp/ci-model.xml')
+print('XML parse check passed')
+PY

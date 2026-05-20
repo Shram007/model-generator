@@ -49,3 +49,4 @@ outputs/
 docs/_build
 docs/_static
 docs/_templates
+model-generator-rs/target/

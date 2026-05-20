@@ -19,16 +19,15 @@ The project is a Cargo workspace with three crates:
 |-------|------|---------|
 | `config` | `crates/config` | Typed, serialisable PDAG configuration structs (TOML + JSON) |
 | `pdag` | `crates/pdag` | Layer-by-layer PDAG builder on `petgraph` with seeded RNG |
-| `model-generator-rs` (binary) | `crates/cli` | `clap` CLI with `config` and `generate` sub-commands |
+| `fault_tree` | `crates/fault_tree` | PDAG → Fault Tree mapping + Open-PSA MEF XML serializer |
+| `event_tree` | `crates/event_tree` | Event Tree model and sequence mapper |
+| `connector` | `crates/connector` | Shared event linking across multiple fault trees |
+| `validator` | `crates/validator` | Structural, probabilistic, and reference validators |
+| `model-generator-rs` (binary) | `crates/cli` | `clap` CLI with `config`, `generate`, and `batch` sub-commands |
 
-### Planned crates (future phases)
+### Extended outputs
 
-| Crate | Phase | Purpose |
-|-------|-------|---------|
-| `fault_tree` | 2 | PDAG → Fault Tree mapping + Open-PSA MEF XML output |
-| `event_tree` | 3 | Event Tree with OR-gate FT↔ET linkage |
-| `connector` | 4 | Cross-tree fault-event connectors + batch generation |
-| `validator` | 5 | Acyclicity, probability range, and reference-integrity checks |
+The CLI can now emit Open-PSA MEF XML for both fault trees and event trees.
 
 ---
 
@@ -137,7 +136,7 @@ cargo clippy -- -D warnings
 | Phase | Status | Deliverable |
 |-------|--------|-------------|
 | 1 | ✅ Complete | Rust workspace, `config` crate, `pdag` builder, `cli` |
-| 2 | ⏳ Planned | `fault_tree` crate + Open-PSA MEF XML output |
-| 3 | ⏳ Planned | `event_tree` crate with OR-gate FT↔ET linkage |
-| 4 | ⏳ Planned | `connector` crate + multi-tree batch generation |
-| 5 | ⏳ Planned | `validator` crate + docs + load-test profiles |
+| 2 | ✅ Complete | `fault_tree` crate + Open-PSA MEF XML output |
+| 3 | ✅ Complete | `event_tree` crate with FT↔ET linkage |
+| 4 | ✅ Complete | `connector` crate + multi-tree batch generation |
+| 5 | ✅ Complete | `validator` crate + docs + load-test profiles |

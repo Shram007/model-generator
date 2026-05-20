@@ -177,10 +177,7 @@ impl PdagConfig {
     /// Call this after deserialising from a user-supplied file.
     pub fn validate(&self) -> Result<(), ConfigError> {
         // Probability bounds
-        if self.min_prob < 0.0
-            || self.max_prob > 1.0
-            || self.min_prob > self.max_prob
-        {
+        if self.min_prob < 0.0 || self.max_prob > 1.0 || self.min_prob > self.max_prob {
             return Err(ConfigError::InvalidProbabilityBounds {
                 min: self.min_prob,
                 max: self.max_prob,
@@ -193,9 +190,7 @@ impl PdagConfig {
         }
 
         // Nodes per layer
-        if self.nodes_per_layer_min < 1
-            || self.nodes_per_layer_min > self.nodes_per_layer_max
-        {
+        if self.nodes_per_layer_min < 1 || self.nodes_per_layer_min > self.nodes_per_layer_max {
             return Err(ConfigError::InvalidNodesPerLayer {
                 min: self.nodes_per_layer_min,
                 max: self.nodes_per_layer_max,
@@ -203,8 +198,7 @@ impl PdagConfig {
         }
 
         // Children per node (must be ≥ 2 so every gate has at least 2 inputs)
-        if self.children_per_node_min < 2
-            || self.children_per_node_min > self.children_per_node_max
+        if self.children_per_node_min < 2 || self.children_per_node_min > self.children_per_node_max
         {
             return Err(ConfigError::InvalidChildrenPerNode {
                 min: self.children_per_node_min,
@@ -231,28 +225,26 @@ impl PdagConfig {
 
     /// Serialises the config to a TOML string.
     pub fn to_toml(&self) -> Result<String, ConfigError> {
-        toml::to_string_pretty(self)
-            .map_err(|e| ConfigError::Serialise(e.to_string()))
+        toml::to_string_pretty(self).map_err(|e| ConfigError::Serialise(e.to_string()))
     }
 
     /// Deserialises a config from a TOML string and validates it.
     pub fn from_toml(input: &str) -> Result<Self, ConfigError> {
-        let cfg: Self = toml::from_str(input)
-            .map_err(|e| ConfigError::Deserialise(e.to_string()))?;
+        let cfg: Self =
+            toml::from_str(input).map_err(|e| ConfigError::Deserialise(e.to_string()))?;
         cfg.validate()?;
         Ok(cfg)
     }
 
     /// Serialises the config to a pretty-printed JSON string.
     pub fn to_json(&self) -> Result<String, ConfigError> {
-        serde_json::to_string_pretty(self)
-            .map_err(|e| ConfigError::Serialise(e.to_string()))
+        serde_json::to_string_pretty(self).map_err(|e| ConfigError::Serialise(e.to_string()))
     }
 
     /// Deserialises a config from a JSON string and validates it.
     pub fn from_json(input: &str) -> Result<Self, ConfigError> {
-        let cfg: Self = serde_json::from_str(input)
-            .map_err(|e| ConfigError::Deserialise(e.to_string()))?;
+        let cfg: Self =
+            serde_json::from_str(input).map_err(|e| ConfigError::Deserialise(e.to_string()))?;
         cfg.validate()?;
         Ok(cfg)
     }

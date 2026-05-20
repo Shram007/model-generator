@@ -24,8 +24,8 @@
 
 use std::collections::{BTreeSet, HashMap};
 
-use petgraph::Direction;
 use petgraph::graph::{DiGraph, NodeIndex};
+use petgraph::Direction;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
@@ -97,16 +97,16 @@ pub struct Pdag {
 impl Pdag {
     /// Returns an iterator over all basic-event nodes.
     pub fn basic_events(&self) -> impl Iterator<Item = NodeIndex> + '_ {
-        self.graph.node_indices().filter(|&idx| {
-            matches!(self.graph[idx].kind, NodeKind::BasicEvent)
-        })
+        self.graph
+            .node_indices()
+            .filter(|&idx| matches!(self.graph[idx].kind, NodeKind::BasicEvent))
     }
 
     /// Returns an iterator over all gate nodes (including the root).
     pub fn gates(&self) -> impl Iterator<Item = NodeIndex> + '_ {
-        self.graph.node_indices().filter(|&idx| {
-            !matches!(self.graph[idx].kind, NodeKind::BasicEvent)
-        })
+        self.graph
+            .node_indices()
+            .filter(|&idx| !matches!(self.graph[idx].kind, NodeKind::BasicEvent))
     }
 
     /// Returns the children (direct successors) of a node.
@@ -173,17 +173,15 @@ impl PdagBuilder {
         for layer_idx in 1..total_layers {
             let is_leaf_layer = layer_idx == total_layers - 1;
 
-            let n_nodes = self.rng.gen_range(
-                self.cfg.nodes_per_layer_min..=self.cfg.nodes_per_layer_max,
-            );
+            let n_nodes = self
+                .rng
+                .gen_range(self.cfg.nodes_per_layer_min..=self.cfg.nodes_per_layer_max);
 
             // Create nodes for this layer
             let mut current_layer: Vec<NodeIndex> = Vec::with_capacity(n_nodes);
             for node_idx in 0..n_nodes {
                 let data = if is_leaf_layer {
-                    let prob = self.rng.gen_range(
-                        self.cfg.min_prob..=self.cfg.max_prob,
-                    );
+                    let prob = self.rng.gen_range(self.cfg.min_prob..=self.cfg.max_prob);
                     NodeData {
                         name: format!("BE-{}-{}", layer_idx, node_idx),
                         kind: NodeKind::BasicEvent,
@@ -252,20 +250,27 @@ impl PdagBuilder {
 
         for &parent in parents {
             let current = child_count[&parent];
-            let target = self.rng.gen_range(
-                self.cfg.children_per_node_min..=self.cfg.children_per_node_max,
-            );
+            let target = self
+                .rng
+                .gen_range(self.cfg.children_per_node_min..=self.cfg.children_per_node_max);
             if current >= target {
                 continue;
             }
-            let extra = target - current;
-            for _ in 0..extra {
-                let child_idx = self.rng.gen_range(0..children.len());
-                let child = children[child_idx];
-                // Avoid duplicate edges (petgraph allows them; we do not want them)
-                if !graph.contains_edge(parent, child) {
-                    graph.add_edge(parent, child, ());
+            let mut connected = graph
+                .neighbors_directed(parent, Direction::Outgoing)
+                .collect::<BTreeSet<_>>();
+            while connected.len() < target {
+                let candidates = children
+                    .iter()
+                    .copied()
+                    .filter(|child| !connected.contains(child))
+                    .collect::<Vec<_>>();
+                if candidates.is_empty() {
+                    break;
                 }
+                let child = candidates[self.rng.gen_range(0..candidates.len())];
+                graph.add_edge(parent, child, ());
+                connected.insert(child);
             }
         }
 
@@ -282,16 +287,13 @@ impl PdagBuilder {
         graph: &mut DiGraph<NodeData, ()>,
         leaf_layer: &[NodeIndex],
     ) {
-        let n_common = (leaf_layer.len() as f64
-            * self.cfg.common_basic_event_fraction)
-            .round() as usize;
+        let n_common =
+            (leaf_layer.len() as f64 * self.cfg.common_basic_event_fraction).round() as usize;
 
         // Collect parent-layer (penultimate) nodes
         let penultimate: Vec<NodeIndex> = leaf_layer
             .iter()
-            .flat_map(|&leaf| {
-                graph.neighbors_directed(leaf, Direction::Incoming)
-            })
+            .flat_map(|&leaf| graph.neighbors_directed(leaf, Direction::Incoming))
             .collect::<BTreeSet<_>>()
             .into_iter()
             .collect();
@@ -386,7 +388,10 @@ mod tests {
     fn basic_event_probabilities_in_range() {
         let cfg = PdagConfig::default();
         let (min, max) = (cfg.min_prob, cfg.max_prob);
-        let pdag = PdagBuilder::new(cfg).expect("valid").build().expect("build");
+        let pdag = PdagBuilder::new(cfg)
+            .expect("valid")
+            .build()
+            .expect("build");
         for idx in pdag.basic_events() {
             let prob = pdag.graph[idx]
                 .probability
@@ -413,10 +418,14 @@ mod tests {
         assert_eq!(p1.edge_count(), p2.edge_count());
 
         // Node names must match in insertion order
-        let names1: Vec<_> = p1.graph.node_indices()
+        let names1: Vec<_> = p1
+            .graph
+            .node_indices()
             .map(|i| p1.graph[i].name.clone())
             .collect();
-        let names2: Vec<_> = p2.graph.node_indices()
+        let names2: Vec<_> = p2
+            .graph
+            .node_indices()
             .map(|i| p2.graph[i].name.clone())
             .collect();
         assert_eq!(names1, names2);
